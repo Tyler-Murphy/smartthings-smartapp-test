@@ -1,8 +1,10 @@
 export {
-    ExecutionRequest
+    ExecutionRequest,
+    ExecutionResponse,
 }
 
 type ExecutionRequest = InstallRequest | UpdateRequest | UninstallRequest | EventRequest | PingRequest | ConfigurationRequest | OauthCallbackRequest
+type ExecutionResponse = InstallResponse | UpdateResponse | UninstallResponse | EventResponse | PingResponse | ConfigurationResponse | OauthCallbackResponse
 
 type LifecycleEventName = 'INSTALL' | 'UPDATE' | 'UNINSTALL' | 'EVENT' | 'PING' | 'CONFIGURATION' | 'OAUTH_CALLBACK'
 
@@ -19,6 +21,10 @@ interface BaseExecutionRequest {
     settings?: { [key: string]: string }
 }
 
+interface BaseExecutionResponse {
+    statusCode: 200 | 500,
+}
+
 interface InstallRequest extends BaseExecutionRequest {
     lifecycle: 'INSTALL',
     installData: {
@@ -26,6 +32,10 @@ interface InstallRequest extends BaseExecutionRequest {
         refreshToken?: RefreshToken,
         installedApp: InstalledApp
     }
+}
+
+interface InstallResponse extends BaseExecutionResponse {
+    installData: {}
 }
 
 interface UpdateRequest extends BaseExecutionRequest {
@@ -39,9 +49,17 @@ interface UpdateRequest extends BaseExecutionRequest {
     }
 }
 
+interface UpdateResponse extends BaseExecutionResponse {
+    updateData: {}
+}
+
 interface UninstallRequest extends BaseExecutionRequest {
     lifecycle: 'UNINSTALL',
     uninstallData: InstalledApp
+}
+
+interface UninstallResponse extends BaseExecutionResponse {
+    uninstallData: {}
 }
 
 interface EventRequest extends BaseExecutionRequest {
@@ -53,11 +71,17 @@ interface EventRequest extends BaseExecutionRequest {
     }
 }
 
+interface EventResponse extends BaseExecutionResponse {
+    eventData: {}
+}
+
 interface PingRequest extends BaseExecutionRequest {
     lifecycle: 'PING',
-    pingData: {
-        challenge: string
-    }
+    pingData: PingData
+}
+
+interface PingResponse extends BaseExecutionResponse {
+    pingData: PingData
 }
 
 interface ConfigurationRequest extends BaseExecutionRequest {
@@ -71,12 +95,61 @@ interface ConfigurationRequest extends BaseExecutionRequest {
     }
 }
 
+type ConfigurationResponse = ConfigurationInitializeResponse | ConfigurationPageResponse
+
+interface ConfigurationInitializeResponse extends BaseExecutionResponse {
+    configurationData: {
+        initialize: {
+            id: string,
+            name: string,
+            description: string,
+            firstPageId: string,
+            disableCustomDisplayName?: boolean,
+            disableRemoveApp?: boolean,
+            permissions: Permissions
+        }
+    }
+}
+
+interface ConfigurationPageResponse extends BaseExecutionResponse {
+    configurationData: {
+        page: {
+            name: string,
+            pageId: string,
+            nextPageId: string,
+            previousPageId: string,
+            complete?: boolean,
+            sections: Array<{
+                name: string,
+                hideable?: boolean,
+                hidden?: boolean,
+                settings: Array<{
+                    id: string,
+                    name: string,
+                    description: string,
+                    defaultValue: string,
+                    required?: boolean,
+                    type: 'DEVICE' | 'TEXT' | 'PASSWORD' | 'BOOLEAN' | 'ENUM' | 'MODE' | 'SCENE' | 'LINK' | 'PAGE' | 'IMAGE' | 'IMAGES' | 'VIDEO' | 'TIME' | 'PARAGRAPH' | 'EMAIL' | 'DECIMAL' | 'NUMBER' | 'PHONE' | 'OAUTH'
+                }>
+            }>
+        }
+    }
+}
+
 interface OauthCallbackRequest extends BaseExecutionRequest {
     lifecycle: 'OAUTH_CALLBACK',
     oauthCallbackData: {
         installedAppId: UUID,
         urlPath: string
     }
+}
+
+interface OauthCallbackResponse extends BaseExecutionResponse {
+    oauthCallbackData: {}
+}
+
+interface PingData {
+    challenge: string
 }
 
 interface InstalledApp {
