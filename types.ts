@@ -1,59 +1,66 @@
-type LifecycleEvent = 'INSTALL' | 'UPDATE' | 'UNINSTALL' | 'EVENT' | 'PING' | 'CONFIGURATION' | 'OAUTH_CALLBACK',
+export {
+    ExecutionRequest
+}
+
+type ExecutionRequest = InstallRequest | UpdateRequest | UninstallRequest | EventRequest | PingRequest | ConfigurationRequest | OauthCallbackRequest
+
+type LifecycleEventName = 'INSTALL' | 'UPDATE' | 'UNINSTALL' | 'EVENT' | 'PING' | 'CONFIGURATION' | 'OAUTH_CALLBACK'
+
 type UUID = string
-
-type ExecutionRequest = Install | Update | Uninstall | Event | Ping | Configuration | OauthCallback
-
+type ISO8601TimeString = string
+type AuthToken = string
+type RefreshToken = string
 
 interface BaseExecutionRequest {
-    lifecycle: LifecycleEvent,
+    lifecycle: LifecycleEventName,
     executionId: UUID,
     locale: string,
     version: string,
     settings?: { [key: string]: string }
 }
 
-interface Install extends BaseExecutionRequest {
+interface InstallRequest extends BaseExecutionRequest {
     lifecycle: 'INSTALL',
     installData: {
-        authToken: string,
-        refreshToken?: string,
+        authToken: AuthToken,
+        refreshToken?: RefreshToken,
         installedApp: InstalledApp
     }
 }
 
-interface Update extends BaseExecutionRequest {
+interface UpdateRequest extends BaseExecutionRequest {
     lifecycle: 'UPDATE',
     updateData: {
-        authToken: string,
-        refreshToken?: string,
+        authToken: AuthToken,
+        refreshToken?: RefreshToken,
         installedApp: InstalledApp,
         previousConfig: ConfigMap,
         previousPermissions: Permissions
     }
 }
 
-interface Uninstall extends BaseExecutionRequest {
+interface UninstallRequest extends BaseExecutionRequest {
     lifecycle: 'UNINSTALL',
     uninstallData: InstalledApp
 }
 
-interface Event extends BaseExecutionRequest {
+interface EventRequest extends BaseExecutionRequest {
     lifecycle: 'EVENT',
     eventData: {
-        authToken: string,
+        authToken: AuthToken,
         installedApp: InstalledApp,
         events: Array<Event>
     }
 }
 
-interface Ping extends BaseExecutionRequest {
+interface PingRequest extends BaseExecutionRequest {
     lifecycle: 'PING',
     pingData: {
         challenge: string
     }
 }
 
-interface Configuration extends BaseExecutionRequest {
+interface ConfigurationRequest extends BaseExecutionRequest {
     lifecycle: 'CONFIGURATION',
     configurationData: {
         installedAppId: UUID,
@@ -64,7 +71,7 @@ interface Configuration extends BaseExecutionRequest {
     }
 }
 
-interface OauthCallback extends BaseExecutionRequest {
+interface OauthCallbackRequest extends BaseExecutionRequest {
     lifecycle: 'OAUTH_CALLBACK',
     oauthCallbackData: {
         installedAppId: UUID,
@@ -102,7 +109,7 @@ interface DeviceConfigEntry extends BaseConfigEntry {
     }
 }
 
-interface ModeConfigEntry extends ModeConfigEntry {
+interface ModeConfigEntry extends BaseConfigEntry {
     valueType: 'MODE',
     modeConfig: {
         modeId: UUID
@@ -164,5 +171,3 @@ interface DeviceCommandsEvent extends BaseEvent {
 }
 
 type Event = DeviceEvent | ModeEvent | TimerEvent | DeviceCommandsEvent
-
-type ISO8601TimeString = string
