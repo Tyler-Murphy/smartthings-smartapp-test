@@ -1,0 +1,15 @@
+{
+  "name": "sample-smart-things-smart-app",
+  "version": "0.0.1",
+  "description": "test",
+  "main": "server.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "Tyler Murphy",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-node": "^8.0.1",
+    "typescript": "^3.2.4"
+  }
+}
