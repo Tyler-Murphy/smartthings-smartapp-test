@@ -165,4 +165,4 @@ interface DeviceCommandsEvent extends BaseEvent {
 
 type Event = DeviceEvent | ModeEvent | TimerEvent | DeviceCommandsEvent
 
-type ISO8601TimeString
+type ISO8601TimeString = string
