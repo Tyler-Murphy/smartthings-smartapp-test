@@ -1,6 +1,22 @@
 export {
     ExecutionRequest,
     ExecutionResponse,
+    ConfigurationRequest,
+    ConfigurationResponse,
+    ConfigurationInitializeResponse,
+    ConfigurationPageResponse,
+    PingRequest,
+    PingResponse,
+    InstallRequest,
+    InstallResponse,
+    UpdateRequest,
+    UpdateResponse,
+    EventRequest,
+    EventResponse,
+    OauthCallbackRequest,
+    OauthCallbackResponse,
+    UninstallRequest,
+    UninstallResponse,
 }
 
 type ExecutionRequest = InstallRequest | UpdateRequest | UninstallRequest | EventRequest | PingRequest | ConfigurationRequest | OauthCallbackRequest
@@ -21,9 +37,7 @@ interface BaseExecutionRequest {
     settings?: { [key: string]: string }
 }
 
-interface BaseExecutionResponse {
-    statusCode: 200 | 500,
-}
+interface BaseExecutionResponse {}
 
 interface InstallRequest extends BaseExecutionRequest {
     lifecycle: 'INSTALL',
@@ -123,18 +137,116 @@ interface ConfigurationPageResponse extends BaseExecutionResponse {
                 name: string,
                 hideable?: boolean,
                 hidden?: boolean,
-                settings: Array<{
-                    id: string,
-                    name: string,
-                    description: string,
-                    defaultValue: string,
-                    required?: boolean,
-                    type: 'DEVICE' | 'TEXT' | 'PASSWORD' | 'BOOLEAN' | 'ENUM' | 'MODE' | 'SCENE' | 'LINK' | 'PAGE' | 'IMAGE' | 'IMAGES' | 'VIDEO' | 'TIME' | 'PARAGRAPH' | 'EMAIL' | 'DECIMAL' | 'NUMBER' | 'PHONE' | 'OAUTH'
-                }>
+                settings: Array<Setting>
             }>
         }
     }
 }
+
+// complete this
+type Setting = DeviceSetting | TextSetting | BooleanSetting | EnumSetting | LinkSetting | PageSetting | ImageSetting | TimeSetting | ParagraphSetting | EmailSetting | DecimalSetting | NumberSetting | PhoneSetting | OauthSetting
+
+interface BaseSetting {
+    id: string,
+    name: string,
+    description: string,
+    required?: boolean,
+    type: 'DEVICE' | 'TEXT' | 'PASSWORD' | 'BOOLEAN' | 'ENUM' | 'MODE' | 'SCENE' | 'LINK' | 'PAGE' | 'IMAGE' | 'IMAGES' | 'VIDEO' | 'TIME' | 'PARAGRAPH' | 'EMAIL' | 'DECIMAL' | 'NUMBER' | 'PHONE' | 'OAUTH'
+}
+
+interface DeviceSetting extends BaseSetting {
+    type: 'DEVICE',
+    multiple: boolean,
+    capabilities: Array<Capability>,
+    permissions: Array<DevicePermission>
+}
+
+interface TextSetting extends BaseSetting {
+    type: 'TEXT',
+    defaultValue: string
+}
+
+interface BooleanSetting extends BaseSetting {
+    type: 'BOOLEAN',
+    defaultValue: 'true' | 'false'
+}
+
+type EnumSetting = EnumOptionsSetting | EnumGroupedOptionsSetting
+
+// need to support options or groupedOptions, but not both
+interface BaseEnumSetting extends BaseSetting {
+    multiple: boolean
+}
+
+type EnumOptions = Array<{
+    id: string,
+    name: string
+}>
+
+interface EnumOptionsSetting extends BaseEnumSetting {
+    options: EnumOptions
+}
+
+interface EnumGroupedOptionsSetting extends BaseEnumSetting {
+    groupedOptions: Array<{
+        name: string,
+        options: EnumOptions
+    }>
+}
+
+interface LinkSetting extends BaseSetting {
+    type: 'LINK',
+    url: string,
+    image: string
+}
+
+interface PageSetting extends BaseSetting {
+    type: 'PAGE',
+    page: string,
+    image: string
+}
+
+interface ImageSetting extends BaseSetting {
+    type: 'IMAGE',
+    height: string,
+    width: string,
+    image: string
+}
+
+interface TimeSetting extends BaseSetting {
+    type: 'TIME',
+}
+
+interface ParagraphSetting extends BaseSetting {
+    type: 'PARAGRAPH',
+    defaultValue: string,
+}
+
+interface EmailSetting extends BaseSetting {
+    type: 'EMAIL'
+}
+
+interface DecimalSetting extends BaseSetting {
+    type: 'DECIMAL'
+}
+
+interface NumberSetting extends BaseSetting {
+    type: 'NUMBER'
+}
+
+interface PhoneSetting extends BaseSetting {
+    type: 'PHONE'
+}
+
+interface OauthSetting extends BaseSetting {
+    type: 'OAUTH',
+    urlTemplate: string
+}
+
+// this only includes live capabilities
+type Capability = 'accelerationSensor' | 'alarm' | 'audioMute' | 'audioNotification' | 'battery' | 'beacon' | 'carbonDioxideMeasurement' | 'carbonMonoxideDetector' | 'colorControl' | 'colorTemperature' | 'configuration' | 'contactSensor' | 'doorControl' | 'energyMeter' | 'illuminanceMeasurement' | 'infraredLevel' | 'momentary' | 'motionSensor' | 'notification' | 'pHMeasurement' | 'powerMeter' | 'powerSource' | 'presenceSensor' | 'refresh' | 'relativeHumidityMeasurement' | 'signalStrength' | 'sleepSensor' | 'smokeDetector' | 'soundSensor' | 'switchLevel' | 'switch' | 'tamperAlert' | 'temperatureMeasurement' | 'thermostatCoolingSetpoint' | 'thermostatFanMode' | 'thermostatHeatingSetpoint' | 'thermostatMode' | 'thermostatOperatingState' | 'threeAxis' | 'tone' | 'ultravioletIndex' | 'valve' | 'voltageMeasurement' | 'waterSensor'
+
+type DevicePermission = 'r' | 'x' | 'w'
 
 interface OauthCallbackRequest extends BaseExecutionRequest {
     lifecycle: 'OAUTH_CALLBACK',
@@ -191,7 +303,9 @@ interface ModeConfigEntry extends BaseConfigEntry {
 
 type ConfigEntry = StringConfigEntry | DeviceConfigEntry | ModeConfigEntry
 
-type Permissions = Array<string>
+type Permissions = Array<Permission>
+
+type Permission = 'r:installedapps:*' | 'l:installedapps' | 'w:installedapps:*' | 'r:apps:*' | 'w:apps:*' | 'l:devices' | 'r:devices:*' | 'w:devices:*' | 'x:devices:*' | 'r:deviceprofiles' | 'w:deviceprofiles' | 'i:deviceprofiles' | 'r:schedules' | 'w:schedules' | 'l:locations' | 'r:locations:*' | 'w:locations:*' | 'r:scenes:*' | 'x:scenes:*'
 
 interface BaseEvent {
     eventType: 'DEVICE_EVENT' | 'MODE_EVENT' | 'TIMER_EVENT' | 'DEVICE_COMMANDS_EVENT'
