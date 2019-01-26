@@ -17,6 +17,7 @@ export {
     OauthCallbackResponse,
     UninstallRequest,
     UninstallResponse,
+    Capability
 }
 
 type ExecutionRequest = InstallRequest | UpdateRequest | UninstallRequest | EventRequest | PingRequest | ConfigurationRequest | OauthCallbackRequest

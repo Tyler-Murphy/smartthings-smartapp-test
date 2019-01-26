@@ -10,7 +10,12 @@
   "author": "Tyler Murphy",
   "license": "ISC",
   "devDependencies": {
-    "ts-node": "^8.0.1",
+    "ts-node": "^8.0.2",
     "typescript": "^3.2.4"
+  },
+  "dependencies": {
+    "@types/node": "^10.12.18",
+    "@types/node-fetch": "^2.1.4",
+    "node-fetch": "^2.3.0"
   }
 }
