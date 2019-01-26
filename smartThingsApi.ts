@@ -53,7 +53,7 @@ async function subscribeToAllMotionSensors(authToken: string, installedAppId: st
     console.log('installedAppId', installedAppId)
     console.log(JSON.stringify(subscriptionRequest, null, ' '))
 
-    const response = await request(authToken, `installedApps/${installedAppId}/subscriptions`, {
+    const response = await request(authToken, `installedapps/${installedAppId}/subscriptions`, {
         method: 'POST',
         body: JSON.stringify(subscriptionRequest)
     })
