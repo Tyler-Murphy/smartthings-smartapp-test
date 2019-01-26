@@ -32,7 +32,8 @@ const httpHandler: Parameters<typeof http.createServer>[0] = async function (req
         return response.end(errorResponse(error))
     }
 
-    console.log(`Incoming:`)
+    console.log('')
+    console.log(`############ Incoming ############`)
     console.log(JSON.stringify(incomingRequest, null, '  '))
 
     try {
