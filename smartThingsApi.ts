@@ -4,7 +4,8 @@ import {
 } from './types';
 
 export {
-    subscribeToAllMotionSensors
+    subscribeToAllMotionSensors,
+    listAllDevices,
 }
 
 type SubscriptionRequest = DeviceSubscriptionRequest | CapabilitySubscriptionRequest
@@ -62,6 +63,43 @@ async function subscribeToAllMotionSensors(authToken: string, installedAppId: st
 
     console.log(`Response to request to subscribe to all motion sensors:`)
     console.log(JSON.stringify(responseBody, null, '  '))
+}
+
+interface BaseDevice {
+    deviceId: string,
+    name: string,
+    label: string,
+    deviceManufacturerCode: string,
+    locationId: string,
+    components: Array<{
+        id: string,
+        capabilities: Array<Capability>
+    }>,
+    type: 'DTH' | 'ENDPOINT_APP'
+}
+
+interface DTHDevice extends BaseDevice {
+    type: 'DTH',
+    dth: {
+        deviceTypeId: string,
+        deviceTypeName: string,
+        deviceNetworkType: string
+    }
+}
+
+interface EndpointAppDevice extends BaseDevice {
+    type: 'ENDPOINT_APP',
+    app: {
+        installedAppId: string,
+        externalId: string,
+        profile: {
+            id: string
+        }
+    }
+}
+
+async function listAllDevices(authToken: string, locationId: string): Promise<void> {
+
 }
 
 const request = function(authToken: string, path: string, request: Pick<RequestInit, 'method' | 'body' | 'headers'>) {
